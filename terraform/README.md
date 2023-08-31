@@ -74,7 +74,7 @@ Copy credentials file to the scripts folder and fix path for the .p12 certificat
         default = "./path-to-api-cert.p12"
     }
 
-Create **VES_P12_PASSWORD** environment variable with the password form the previous step.
+Create **VES_P12_PASSWORD** environment variable with the password from the previous step.
 
     export VES_P12_PASSWORD=your_certificate_password
 
