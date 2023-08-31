@@ -56,11 +56,11 @@ Find **xc_api_url** variable and fill it with your F5 xC tenant name.
         default = "https://your_tenant.console.ves.volterra.io/api"
     }
 
-Sign in to the F5 Distributed Cloud Console and open **Administration** tab.
+Sign in to the F5 Distributed Cloud Console and open the **Administration** tab.
 
 ![](../assets/aws/administration.png)
 
-Open **Credentials** section and click **Add Credentials**.
+Open the **Credentials** section and click **Add Credentials**.
 
 ![](../assets/aws/create_credentials.png)
 
@@ -172,7 +172,7 @@ Run **apply** command to deploy the app
 
 Variable Name       | Description                                                     | Default Value          
 --------------------|-----------------------------------------------------------------|------------------------
-environment         | Environment name. Usually match with XC namspace name.          | "ha-services-ce"                   
+environment         | Environment name. Usually match with XC namespace name.         | "ha-services-ce"                   
 xc_api_p12_file     | API credential p12 file path.                                   | "../api-creds.p12"                  
 xc_api_url          | Tenant API url file path.                                       | "https://**your_tenant_name**.console.ves.volterra.io/api"                   
 kubeconfig_path     | Generated vk8s kubeconfig file path.                            | "../kubeconfig.conf"                   
@@ -184,12 +184,12 @@ aws_secret_key      | AWS Secret Key                                            
 
 Variable Name       | Description                                                     | Default Value          
 --------------------|-----------------------------------------------------------------|------------------------
-environment         | Environment name. Usually match with XC namspace name.          | "ha-services-ce"                   
+environment         | Environment name. Usually match with XC namespace name.         | "ha-services-ce"                   
 xc_api_p12_file     | API credential p12 file path.                                   | "../api-creds.p12"                  
 xc_api_url          | Tenant API url file path.                                       | "https://**your_tenant_name**.console.ves.volterra.io/api"                   
 kubeconfig_path     | vk8s kubeconfig file path.                                      | "../kubeconfig.conf"                   
 helm_path           | Helm charts path.                                               | "../../helm"
-cluster_domain      | Cluster domain in format **{site_name}.{tenant_id}**.tenant.local. Where **site_name** is the Edge site name. Can be generated from [the guide](https://github.com/f5devcentral/xchacedemoguide#step-2-deploy-ha-postgresql-to-ce) or took from the terraform's output of the previous step.    |  **your_site_name.your_tenant_full_name**.tenant.local
+cluster_domain      | Cluster domain in format **{site_name}.{tenant_id}**.tenant.local. Where **site_name** is the Edge site name. Can be generated from [the guide](https://github.com/f5devcentral/xchacedemoguide#step-2-deploy-ha-postgresql-to-ce) or taken from the terraform's output of the previous step.   |  **your_site_name.your_tenant_full_name**.tenant.local
 registry_username   | Docker Registry Username                                        | ""
 registry_password   | Docker Registry Password                                        | ""
 registry_email      | Docker Registry Email                                           | ""
@@ -197,6 +197,6 @@ virtual_site_name   | Virtual Site Name                                         
 
 ## Delete environment
 
-Run the **terraform destroy** command in the **./application** forlder and then in the **./aws-site folder**
+Run the **terraform destroy** command in the **./application** folder and then in the **./aws-site folder**
 
     terraform destroy
