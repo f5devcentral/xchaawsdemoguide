@@ -61,7 +61,7 @@ The app services that consume database objects could reside close to the end-use
 .. figure:: assets/diagram1-1.png
 
 Step 1: Prepare environment for HA Load 
-######################################
+#######################################
  
 F5 Distributed Cloud Services allow creating edge sites with worker nodes on a wide variety of cloud providers: AWS, Azure, GCP. The pre-requisite is one or more Distributed Cloud CE Sites, and once deployed, you can expose the services created on these edge sites via a Site mesh and any additional Load Balancers. The selection of TCP (L3/L4) or HTTP/S (L7) Load Balancers depends on the requirements for the services to communicate with each other. In our case, since we’re exposing a database services, which is a fit for a TCP Load Balancer. Should there be a backend service or anything that exposes an HTTP endpoint for other services to connect to, we could have used an HTTP/S LB instead.  
 Note that a single CE Site may support one or more virtual sites, which is similar to a logical grouping of site resources.  
@@ -75,7 +75,7 @@ The diagram shows how VK8S clusters can be deployed across multiple CEs with vir
 .. figure:: assets/diagr.png
 
 Creating an AWS VPC site
-******************** 
+************************ 
  
 Let's start creating the AWS VPC site with worker nodes. Log in the F5 Distributed Cloud Console and navigate to the **Multi-Cloud Network Connect** service, then to **Site Management** and select **AWS VPC Sites**. Click the **Add AWS VPC Site** button. 
    
@@ -196,7 +196,7 @@ And finally, type in the AWS VPC site name, assign it as a label value, and comp
 Note the virtual site name, as it will be required later. 
  
 Creating VK8S cluster 
-********************
+*********************
  
 At this point, our edge site for the HA Database deployment is ready. Now create the VK8S cluster. Select both virtual sites (one on CE and one on RE) by using the corresponding label: the one created earlier and the *ves-io-shared/ves-io-all-res*. The *all-res* one will be used for the deployment of workloads on all RE’s. 
  
@@ -223,14 +223,14 @@ Step 2: Deploy HA PostgreSQL to CE
 Now that the environment for both RE and CE deployments is ready, we can move on to deploying HA PostgreSQL to CE. We will use Helm charts to deploy a PostgreSQL cluster configuration with the help of Bitnami, which provides ready-made Helm charts for HA databases: MongoDB, MariaDB, PostgreSQL, etc., in available in the Bitnami Library for Kubernetes: `https://github.com/bitnami/charts <https://github.com/bitnami/charts>`_. In general, these Helm charts work very similarly, so the example used here can be applied to most other databases or services.  
  
 HA PostgreSQL Architecture in vK8s 
-*****************************
+**********************************
  
 There are several ways of deploying the HA PostgreSQL. The architecture used in this guide is shown in the picture below. The pgPool deployment will be used to ensure the HA features. 
   
 .. figure:: assets/diagram2.png
  
 Downloading Key
-**************
+***************
  
 To operate with kubectl utility or, in our case, HELM, the *kubeconfig* key is required. xC provides an easy way to get the *kubeconfig* file, control its expiration date, etc. So, let's download the *kubeconfig* for the created VK8s cluster. 
  
@@ -250,7 +250,7 @@ Now we need to add the Bitnami Helm chart repository to Helm and then deploy the
    helm repo add bitnami https://charts.bitnami.com/bitnami
 
 Updating Credentials in Makefile
-***************************
+********************************
 
 Before we can proceed to the next step, we will need to update the creds in the Makefile. Go to the Makefile and update the following variables:
 
@@ -268,7 +268,7 @@ Before we can proceed to the next step, we will need to update the creds in the 
 
  
 Making Secrets
-************ 
+************** 
  
 VK8s need to download docker images from the storage. This might be *docker.io* or any other docker registry your company uses. The docker secrets need to be created from command line using the *kubectl create secret* command. Use the name of the *kubeconfig* file that you downloaded in the previous step. 
  
@@ -278,7 +278,7 @@ NOTE. Please, note that the created secret will not be seen from Registries UI a
  
  
 Updating DB Deployment Chart Values 
-********************************
+***********************************
 
 Bitnami provides ready charts for HA database deployments. The postgresql-ha chart can be used. The chart install requires setup of the corresponding variables so that the HA cluster can run in xC environment. The main things to change are: 
 
@@ -312,14 +312,14 @@ Let's proceed to specify the above-mentioned values in the *values.yaml*:
  
  
 Deploying HA PostgreSQL chart to xC vK8s
-******************************** 
+**************************************** 
  
 As values are now setup to run in xC, deploy the chart to xC vK8s cluster using the **xc-deploy-bd** command in the Visual Studio Code CLI.  
   
 .. figure:: assets/chartdeploy.png 
  
 Checking deployment 
-******************
+*******************
  
 After we deployed the HA PostgreSQL to vK8s, we can check that pods and services are deployed successfully from distributed virtual Kubernetes dashboard. 
  
@@ -345,20 +345,20 @@ Go one step back and take the same steps for the second pod to see its status. T
 .. figure:: assets/logs2.png 
 
 Step 3: Expose CE services to RE deployment
-####################################
+###########################################
  
 The CE deployment is up and running. Now it is necessary to create a secure channel between RE and CE to communicate. RE will read data from the CE deployed database. To do so, two additional objects need to be created. 
  
  
 Exposing CE services 
-*****************
+********************
 
 To access HA Database deployed to CE site, we will need to expose this service via a TCP Load Balancer. Since Load Balancers are created on the basis of an Origin Pool, we will start with creating a pool.  
  
 .. figure:: assets/diagram3.png 
  
 Creating origin pool 
-*****************
+********************
  
 To create an Origin Pool for the vk8s deployed service follow the step below. 
  
@@ -405,7 +405,7 @@ From the Origin Pool drop-down menu, select the origin pool created in the previ
 .. figure:: assets/tcppool.png  
  
 Advertising Load Balancer on RE
-************************** 
+******************************* 
  
 From the **Where to Advertise the VIP** menu, select **Advertise Custom** to configure our own custom config and click **Configure**. 
  
@@ -428,10 +428,10 @@ Complete creating the load balancer by clicking **Save and Exit**.
 .. figure:: assets/saveadvertise.png 
 
 Step 4: Test connection from RE to DB
-################################# 
+##################################### 
  
 Infrastructure to Test the deployed PostgreSQL 
-****************************************
+**********************************************
  
 To test access to the CE deployed Database from RE deployment, we will use an NGINX reverse proxy with a module that gets data from PosgreSQL and this service will be deployed to the Regional Edge. It is not a good idea to use this type of a data pull in production, but it is very useful for test purposes. So, test user will query the RE Deployed NGINX Reverse proxy, which will perform a query to the database. The HTTP Load Balancer and Origin Pool also should be created to access NGINX from RE.  
 
@@ -457,7 +457,7 @@ And now let’s build all this by running the **make docker** command in the Vis
 .. figure:: assets/makedocker.png 
  
 NGINX Reverse Proxy Config to Query PostgreSQL DB
-***********************************************
+*************************************************
  
 NGINX creates a server, listening to port 8080. The default location gets all items from article table and caches them. The following NGINX config sets up the reverse proxy configuration to forward traffic from RE to CE, where “re2ce.internal” is the TCP load balancer we created earlier `Creating TCP Load Balancer`_.
 
@@ -467,7 +467,7 @@ It also sets up a server on a port 8080 to present the query data that returns a
 .. figure:: assets/proxyconfig.png 
  
 Deploying NGINX Reverse Proxy
-****************************
+*****************************
  
 To deploy NGINX run the **make xc-deploy-nginx** command in the Visual Studio Code CLI.  
  
@@ -476,7 +476,7 @@ To deploy NGINX run the **make xc-deploy-nginx** command in the Visual Studio Co
 
  
 Overviewing the NGINX Deployment 
-******************************
+********************************
  
 The vK8s deployment now has additional RE deployments, which contain the newly-configured NGINX proxy. The RE locations included many Points of Presence (PoPs) worldwide, and when selected, it is possible to have our Reverse Proxy service deployed automatically to each of these sites. 
  
@@ -535,7 +535,7 @@ Complete creating the load balancer by clicking **Save and Exit**.
 .. figure:: assets/httpsave.png 
  
 Testing: Request data from PostgreSQL DB 
-************************************
+****************************************
  
 So, in just a few steps above, the HTTP Load Balancer is set up and can be used to access the reverse Proxy which pulls the data from our PostgreSQL DB backend deployed on the CE. Let's copy the generated **CNAME value** of the created HTTP Load Balancer to test requesting data from the PostgreSQL database.  
  
@@ -553,7 +553,7 @@ Refresh the page and pay attention to the decrease in the loading time.
  
  
 Wrap-Up
-######## 
+####### 
  
 At this stage you should have successfully deployed a distributed app architecture with: 
 
