@@ -5,12 +5,9 @@
 Objective
 #########
 
-Use this guide to explore the virtual Kubernetes (vK8s) capabilities F5 Distributed Cloud Services for simplifying deployment and management of distributed workloads 
-across multiple clouds and regions. This will help you get familiar with the general pattern of deploying high-availability configurations by using Kubernetes Helm 
-charts in a multi-node site, which can then be exposed to other services. This is a common use-case leveraging F5 Distributed Cloud Customer Edge (CE) for deploying a 
-backend or a database, which can then be used in conjunction with Regional Edge (RE) deployments that consume and/or interact with the central CE location. 
-In this guide we will use an example of a PostgreSQL database deployment in a High-Availability (HA) configuration on a CE and exposing it to a RE location(s) closer 
-to end-users for lowered latency, improved performance, and data resiliency. 
+Use this guide to explore how F5 Distributed Cloud Services enable **Hybrid Multicloud App Delivery** through virtual Kubernetes (vK8s) clusters, distributed edge sites, and seamless networking across clouds and regions. This guide focuses on deploying high-availability (HA) configurations by using Kubernetes Helm charts in a multi-node site, which can then be exposed to other services. This is a common use-case leveraging F5 Distributed Cloud Customer Edge (CE) for deploying a backend or a database, which can then be used in conjunction with Regional Edge (RE) deployments that consume and/or interact with the central CE location. 
+
+In this guide we will use an example of a PostgreSQL database deployment in a HA configuration on a CE and exposing it to a RE location(s) closer to end-users for lowered latency, improved performance, and data resiliency. 
 
 The guide includes the following key steps: 
 
@@ -19,11 +16,9 @@ The guide includes the following key steps:
 •	Exposing CE services to RE deployment; 
 •	Testing the connection from RE to DB. 
 
-The resulting architecture will be a PostgreSQL database deployed in a HA config on Kubernetes running on several compute nodes within an AWS VPC, and exposing to via 
-TCP Load Balancer to a service in a RE that reads and presents the database contents to the end-users, which is a perfect fit for a CE deployment.  
+The resulting architecture will be a PostgreSQL database deployed in a HA config on Kubernetes running on several compute nodes within an AWS VPC, and exposing via TCP Load Balancer to a service in a RE that reads and presents the database contents to the end-users, which is a perfect fit for a CE deployment.  
  
-Each of the steps in this guide addresses a specific part of the whole deployment process and describes it in detail. Therefore, this guide can be completed step-by-step 
-or by skipping some of the steps if you are already familiar with them.  
+Each of the steps in this guide addresses a specific part of the whole deployment process and describes it in detail. Therefore, this guide can be completed step-by-step or by skipping some of the steps if you are already familiar with them.  
 
 Resources 
 #########
@@ -46,15 +41,15 @@ For more information on the use cases covered by this Demo Guide, please see the
 Pre-requisites 
 ##############
 
-•	F5 Distributed Cloud Account 
+•	F5 Distributed Cloud Console account 
 •	AWS (or another cloud account) for deploying a CE Site 
-•	A Web browser to test the connectivity from RE to DB  
+•	A web browser to test the connectivity from RE to DB  
 •	Kubernetes CLI 
 
 Deployment architecture
 #######################
 
-Distributed Cloud Sites on an AWS VPC, which provides ways to easily connect and manage the multi-cloud infrastructure. Such deployment results in a robust distributed app infrastructure with full mesh connectivity, and ease of management as if it were a single K8S cluster. It provides an ideal platform for several nodes to be provisioned in a high-availability configuration for a PostgreSQL database cluster. The services within this cluster can then be exposed to other app services by way of a TCP load balancer. 
+F5 Distributed Cloud Sites on an AWS VPC provide ways to easily connect and manage the multi-cloud infrastructure. Such deployment results in a robust distributed app infrastructure with full mesh connectivity, and ease of management as if it were a single K8s cluster. It provides an ideal platform for several nodes to be provisioned in a high-availability configuration for a PostgreSQL database cluster. The services within this cluster can then be exposed to other app services by way of a TCP load balancer. 
  
 The app services that consume database objects could reside close to the end-user if they are deployed in F5 Distributed Cloud Regional Edge, resulting in the following optimized architecture: 
 
@@ -63,28 +58,28 @@ The app services that consume database objects could reside close to the end-use
 Step 1: Prepare environment for HA Load 
 #######################################
  
-F5 Distributed Cloud Services allow creating edge sites with worker nodes on a wide variety of cloud providers: AWS, Azure, GCP. The pre-requisite is one or more Distributed Cloud CE Sites, and once deployed, you can expose the services created on these edge sites via a Site mesh and any additional Load Balancers. The selection of TCP (L3/L4) or HTTP/S (L7) Load Balancers depends on the requirements for the services to communicate with each other. In our case, since we’re exposing a database services, which is a fit for a TCP Load Balancer. Should there be a backend service or anything that exposes an HTTP endpoint for other services to connect to, we could have used an HTTP/S LB instead.  
+F5 Distributed Cloud Services allow creating edge sites with worker nodes on a wide variety of cloud providers: AWS, Azure, GCP. The pre-requisite is one or more Distributed Cloud CE Sites, and once deployed, you can expose the services created on these edge sites via a Site mesh and any additional Load Balancers. The selection of TCP (L3/L4) or HTTP/S (L7) Load Balancers depends on the requirements for the services to communicate with each other. In our case we’re exposing a database service, which is a fit for a TCP Load Balancer. Should there be a backend service or anything that exposes an HTTP endpoint for other services to connect to, we could have used an HTTP/S LB instead.  
 Note that a single CE Site may support one or more virtual sites, which is similar to a logical grouping of site resources.  
  
 A single virtual site can also be deployed across multiple CEs, thus creating a multi-cloud infrastructure. It’s also possible to place several virtual sites into one CE, each with their own policy settings for more granular security and app service management. It is also feasible for several virtual sites to share both the same and different CE sites as underlying resources. 
  
 During the creation of sites & virtual sites labels such as site name, site type and others can be used to organize site resources. If you want to use site name to organize an edge site as a virtual site, then *ves.io/siteName* label can be used. 
  
-The diagram shows how VK8S clusters can be deployed across multiple CEs with virtual sites to control distributed cloud infrastructure. Note that this architecture shows four virtual clusters assigned to CE sites in different ways.
+The diagram shows how vK8s clusters can be deployed across multiple CEs with virtual sites to control distributed cloud infrastructure. Note that this architecture shows four virtual clusters assigned to CE sites in different ways.
 
 .. figure:: assets/diagr.png
 
 Creating an AWS VPC site
 ************************ 
  
-Let's start creating the AWS VPC site with worker nodes. Log in the F5 Distributed Cloud Console and navigate to the **Multi-Cloud Network Connect** service, then to **Site Management** and select **AWS VPC Sites**. Click the **Add AWS VPC Site** button. 
+Let's start creating the AWS VPC site with worker nodes. Log in the Console and navigate to the **Multi-Cloud Network Connect** service, then to **Site Management** and select **AWS VPC Sites**. Click the **Add AWS VPC Site** button. 
    
 .. figure:: assets/awsvpc.png
  
-Then give the site a name and select the AWS Region for it. In this guide we use the **ca-central-1** region.  
+First, give the site a name. Then from the **Cloud Credentials** drop-down menu, select the existing AWS credentials object. Proceed to AWS Region. In this guide we use the **ca-central-1** region.  
  
-.. figure:: assets/awsvpcname.png 
- 
+.. figure:: assets/awsvpcname.png
+
 Enter the **10.0.0.0/16** CIDR in the Primary IPv4 CIDR block field and move on to set the node configuration. Under the Ingress Gateway (One Interface) click **Configure**. 
  
 .. figure:: assets/vpcconfig.png 
@@ -114,33 +109,27 @@ Select **ca-central-1d** from the AWS AZ Name menu and enter new subnet address 
  
 .. figure:: assets/zone3.png 
  
-After we configured 3 nodes, let’s proceed and apply the configuration.  
+After we configured 3 nodes, select the **Allow HTTP & HTTPS Port** and apply the configuration.  
   
 .. figure:: assets/nodeapply.png 
- 
-From the Cloud Credentials drop-down menu, select the existing AWS credentials object. 
- 
-.. figure:: assets/deployment.png 
 
 Next, we will paste the Public SSH key to access the site. Note that if you don't have a key, you can generate one using the "ssh-keygen" command and then display it with the command "cat ~/.ssh/id_rsa.pub".
 
 .. figure:: assets/ssh_key.png 
  
 Next, we will configure Desired Worker Nodes in the advanced configuration. To do that, in the **Advanced Configuration** section, enable the **Show Advanced Fields** option. 
-Then open the Desired Worker Nodes Selection menu. 
   
 .. figure:: assets/advanced.png
  
-From the Desired Worker Nodes Selection menu, select the **Desired Worker Nodes Per AZ** option and enter the number of worker nodes **1** for this demo. The number of worker nodes you set here will be created per the availability zone in which you created nodes.  
-Then click the **Save and Exit** button to complete the AWS VPC site creation. 
+Then open the Desired Worker Nodes Selection menu and select the **Desired Worker Nodes Per AZ** option and enter the number of worker nodes **1** for this demo. The number of worker nodes you set here will be created per the availability zone in which you created nodes. Then click the **Add AWS VPC Site** button to complete the AWS VPC site creation. 
  
 .. figure:: assets/saveawsvpc.png 
  
-Note that site upgrades may take up to 10 minutes per site node. Once a site upgrade has been completed, we need to apply the Terraform parameters to site via Action menu on cloud site management page. The Status box for the VPC site object displays Generated. So, click **Apply** in the Actions column. 
+Note that site upgrades may take up to 10 minutes per site node. Once a site upgrade has been completed, we need to apply the Terraform parameters to site. The **Status** box for the site object displays **Validation Succeeded**. So, click **Apply** in the **Deployment** column.
   
 .. figure:: assets/applysite.png 
  
-First, the Status field for the AWS VPC object changes to Apply Planning. Wait for the apply process to complete and the status to change to Applied. 
+First, the Status field for the AWS VPC object changes to **Applying**. Wait for the apply process to complete and the status to change to **Applied**. 
 
 Attaching label 
 ***************
@@ -159,13 +148,10 @@ As mentioned before, select the **ves.io/siteName** key.
  
 .. figure:: assets/key.png
  
-And then type in the AWS VPC site name so assign its custom value as the key.  
+And then type in the AWS VPC site name to assign its custom value as the key.  Click **Save AWS VPC Site** to apply the label configuration.  
   
 .. figure:: assets/assignvalue.png 
- 
-Click **Save and Exit** to apply the label configuration.  
-  
-.. figure:: assets/labelsave.png 
+
  
 Creating Virtual Site
 ********************* 
