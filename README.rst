@@ -175,7 +175,7 @@ Then select the **==** operator.
   
 .. figure:: assets/vsoperator.png 
  
-And finally, type in the AWS VPC site name, assign it as a label value, and complete the process by clicking the **Save and Exit** button.  
+And finally, type in the AWS VPC site name, assign it as a label value, and complete the process by clicking the **Add Virtual site** button.  
   
 .. figure:: assets/vslabelvalue.png 
  
@@ -519,7 +519,7 @@ Click the **Apply** button to apply the origin pool configuration to the HTTP Lo
   
 .. figure:: assets/poolapply.png 
  
-Complete creating the load balancer by clicking **Save and Exit**. 
+Complete creating the load balancer by clicking **Add HTTP Load Balancer**. 
   
 .. figure:: assets/httpsave.png 
  
