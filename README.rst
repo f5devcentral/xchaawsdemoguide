@@ -109,7 +109,7 @@ Select **ca-central-1d** from the AWS AZ Name menu and enter new subnet address 
  
 .. figure:: assets/zone3.png 
  
-After we configured 3 nodes, select the **Allow HTTP & HTTPS Port** and apply the configuration.  
+After we configured 3 nodes, select **Allow HTTP & HTTPS Port** and apply the configuration.  
   
 .. figure:: assets/nodeapply.png 
 
@@ -156,7 +156,7 @@ And then type in the AWS VPC site name to assign its custom value as the key.  C
 Creating Virtual Site
 ********************* 
  
-As soon as an edge site is created and the label is assigned, create a virtual site, as described below. The virtual site should be of the CE type and the label must be *ves.io/siteName* with operation *==* and the name of the AWS VPC site.  
+As soon as an edge site is created and the label is assigned, create a virtual site, as described below. The virtual site should be of the CE type. Its label must be *ves.io/siteName* with operation *==* and the name of the AWS VPC site.  
  
 Navigate to the **Distributed Apps** service and select **Virtual Sites** in the Manage section. After that click **Add Virtual Site** to load the creation form. 
  
@@ -184,7 +184,7 @@ Note the virtual site name, as it will be required later.
 Creating VK8S cluster 
 *********************
  
-At this point, our edge site for the HA Database deployment is ready. Now create the VK8S cluster. Select both virtual sites (one on CE and one on RE) by using the corresponding label: the one created earlier and the *ves-io-shared/ves-io-all-res*. The *all-res* one will be used for the deployment of workloads on all RE’s. 
+At this point, our edge site for the HA Database deployment is ready. Now create the vK8s cluster. Select both virtual sites (one on CE and one on RE) by using the corresponding label: the one created earlier and the *ves-io-shared/ves-io-all-res*. The *all-res* one will be used for the deployment of workloads on all RE’s. 
  
 Navigate to the Virtual K8s and click the **Add Virtual K8s** button to create a vK8s object. 
  
@@ -194,19 +194,19 @@ In the Name field, enter a name. In the Virtual Sites section, select **Add item
   
 .. figure:: assets/vk8sname.png 
  
-Then select the virtual site we created using the Select Item pull down menu. Click **Add Item** again to add the second virtual site which is on RE. 
+Then select the virtual site we created from the drop-down menu. Click **Add Item** again to add the second virtual site which is on RE. 
   
 .. figure:: assets/vk8svirtualsite1.png 
  
 Select the **ves-io-shared/ves-io-all-res**. The all-res one will be used for the deployment of workloads on all REs. It includes all regional edge sites across F5 ADN.  
-Complete creating the vK8s object by clicking **Save and Exit**. Wait for the vK8s object to get created and displayed. 
+Complete creating the vK8s object by clicking **Add Virtual K8s**. Wait for the vK8s object to get created and displayed. 
   
 .. figure:: assets/vk8ssecondsite.png 
  
 Step 2: Deploy HA PostgreSQL to CE 
 ##################################
 
-Now that the environment for both RE and CE deployments is ready, we can move on to deploying HA PostgreSQL to CE. We will use Helm charts to deploy a PostgreSQL cluster configuration with the help of Bitnami, which provides ready-made Helm charts for HA databases: MongoDB, MariaDB, PostgreSQL, etc., in available in the Bitnami Library for Kubernetes: `https://github.com/bitnami/charts <https://github.com/bitnami/charts>`_. In general, these Helm charts work very similarly, so the example used here can be applied to most other databases or services.  
+Now that the environment for both RE and CE deployments is ready, we can move on to deploying HA PostgreSQL to CE. We will use Helm charts to deploy a PostgreSQL cluster configuration with the help of Bitnami, which provides ready-made Helm charts for HA databases: MongoDB, MariaDB, PostgreSQL, etc., and is available in the Bitnami Library for Kubernetes: `https://github.com/bitnami/charts <https://github.com/bitnami/charts>`_. In general, these Helm charts work very similarly, so the example used here can be applied to most other databases or services.  
  
 HA PostgreSQL Architecture in vK8s 
 **********************************
@@ -218,7 +218,7 @@ There are several ways of deploying the HA PostgreSQL. The architecture used in 
 Downloading Key
 ***************
  
-To operate with kubectl utility or, in our case, HELM, the *kubeconfig* key is required. xC provides an easy way to get the *kubeconfig* file, control its expiration date, etc. So, let's download the *kubeconfig* for the created VK8s cluster. 
+To operate with kubectl utility or, in our case, HELM, the *kubeconfig* key is required. The Console provides an easy way to get the *kubeconfig* file, control its expiration date, etc. So, let's download the *kubeconfig* for the created vK8s cluster. 
  
 Open the menu of the created virtual K8s and click **Kubeconfig**.  
   
@@ -256,9 +256,9 @@ Before we can proceed to the next step, we will need to update the creds in the 
 Making Secrets
 ************** 
  
-VK8s need to download docker images from the storage. This might be *docker.io* or any other docker registry your company uses. The docker secrets need to be created from command line using the *kubectl create secret* command. Use the name of the *kubeconfig* file that you downloaded in the previous step. 
+vK8s need to download docker images from the storage. This might be *docker.io* or any other docker registry your company uses. The docker secrets need to be created from command line using the *kubectl create secret* command. Use the name of the *kubeconfig* file that you downloaded in the previous step. 
  
-NOTE. Please, note that the created secret will not be seen from Registries UI as this section is used to create Deployments from UI. But HELM script will be used in this demo. 
+NOTE. Please, note that the created secret will not be seen from Registries UI as this section is used to create Deployments from UI. But Helm script will be used in this demo. 
  
 .. figure:: assets/makesecret.png 
  
@@ -266,14 +266,14 @@ NOTE. Please, note that the created secret will not be seen from Registries UI a
 Updating DB Deployment Chart Values 
 ***********************************
 
-Bitnami provides ready charts for HA database deployments. The postgresql-ha chart can be used. The chart install requires setup of the corresponding variables so that the HA cluster can run in xC environment. The main things to change are: 
+Bitnami provides ready charts for HA database deployments. The postgresql-ha chart can be used. The chart install requires setup of the corresponding variables so that the HA cluster can run in the Distributed Cloud Platform environment. The main things to change are: 
 
 - *ves.io/virtual-sites* to specify the virtual site name where the chart will be deployed. 
 - The CE virtual site we created needs to be specified. 
 - Also, clusterDomain key must be set, so that PostgreSQL services could resolve. 
 - And finally, the *kubeVersion* key. 
  
-Note. It is important to specify memory and CPU resources values for PostgreSQL services unless xC will apply its own minimal values, which are not enough for PostgreSQL successful operation. 
+Note. It is important to specify memory and CPU resources values for PostgreSQL services unless the Console applies its own minimal values, which are not enough for PostgreSQL successful operation. 
  
 Let's proceed to specify the above-mentioned values in the *values.yaml*: 
   
@@ -297,11 +297,14 @@ Let's proceed to specify the above-mentioned values in the *values.yaml*:
        runAsNonRoot: true 
  
  
-Deploying HA PostgreSQL chart to xC vK8s
-**************************************** 
+Deploying HA PostgreSQL chart to the Distributed Cloud Platform vK8s
+******************************************************************** 
  
-As values are now setup to run in xC, deploy the chart to xC vK8s cluster using the **xc-deploy-bd** command in the Visual Studio Code CLI.  
-  
+As values are now setup to run in the Distributed Cloud Platform, deploy the chart to the vK8s cluster using the **xc-deploy-bd** command in the Visual Studio Code CLI::
+
+     make xc-deploy-bd
+ 
+ 
 .. figure:: assets/chartdeploy.png 
  
 Checking deployment 
@@ -364,7 +367,7 @@ From the Select Type of Origin Server menu, select the **K8s Service Name of Ori
  
 .. figure:: assets/originserver.png  
  
-Enter a port number in the Port field. We use **5432** for this guide. And complete creating the origin pool by clicking **Save and Exit**. 
+Enter a port number in the Port field. We use **5432** for this guide. And complete creating the origin pool by clicking **Add Origin Pool**. 
  
 .. figure:: assets/poolport.png  
  
@@ -386,7 +389,7 @@ Then move on to the **Origin Pools** section and click **Add Item** to open the 
  
 .. figure:: assets/tcpport.png  
  
-From the Origin Pool drop-down menu, select the origin pool created in the previous step and **Click Apply**. 
+From the Origin Pool drop-down menu, select the origin pool created in the previous step and click **Apply**. 
  
 .. figure:: assets/tcppool.png  
  
@@ -401,7 +404,7 @@ Click **Add Item** to add a site to advertise.
   
 .. figure:: assets/addadvertise.png  
  
-First, select **vK8s Service Network on RE** for Select Where to Advertise field. Then select **Virtual Site Reference** for the reference type, and assign **ves-io-shared/ves-io-all-res** as one. Move on to configure a **TCP listener port** as **5432**. Finally, click **Apply**. 
+First, select **vK8s Service Network on RE** for Select Where to Advertise field. Then select **Virtual Site Reference** for the reference type, and assign **ves-io-shared/ves-io-all-res** as one. Move on to configure a **Listen Port** as **5432**. Finally, click **Apply**. 
   
 .. figure:: assets/advertiseconfig.png  
  
@@ -409,7 +412,7 @@ First, select **vK8s Service Network on RE** for Select Where to Advertise field
   
 .. figure:: assets/applyadvertise.png  
  
-Complete creating the load balancer by clicking **Save and Exit**. 
+Complete creating the load balancer by clicking **Add TCP Load Balancer**. 
  
 .. figure:: assets/saveadvertise.png 
 
@@ -466,7 +469,7 @@ Overviewing the NGINX Deployment
  
 The vK8s deployment now has additional RE deployments, which contain the newly-configured NGINX proxy. The RE locations included many Points of Presence (PoPs) worldwide, and when selected, it is possible to have our Reverse Proxy service deployed automatically to each of these sites. 
  
-Let's now take a look at the NGINX Deployment. Go back to the **F5 Distributed Cloud** console and navigate to the **Distributed Apps** service. Proceed to the **Virtual K8s** and click the one we created earlier.
+Let's now take a look at the NGINX Deployment. Go back to the **F5 Distributed Cloud Console** and navigate to the **Distributed Apps** service. Proceed to the **Virtual K8s** and click the one we created earlier.
    
 .. figure:: assets/vk8soverview.png 
  
@@ -504,11 +507,11 @@ First, give it a name, then specify the **9080** port and proceed to add **Origi
   
 .. figure:: assets/nginxpool.png
  
-First, from the Select Type of Origin Server menu, select **K8s Service Name of Origin Server on given Sites** to specify the origin server with its K8s service name. Then enter the **nginx-rp.ha-services-ce** service name in the Service Name field where *nginx-rp* is the deployed service name and *ha-services-ce* is the namespace. Next, select the **Virtual Site** option in the Site or Virtual Site menu to select **ves-io-shared/ves-io-all-res** site which includes all regional edge sites across F5 ADN. After that select **vK8s Networks on Site** which means that the origin server is on vK8s network on the site and, finally, click **Apply**. 
+First, from the Select Type of Origin Server menu, select **K8s Service Name of Origin Server on given Sites** to specify the origin server with its K8s service name. Then enter the **nginx-rp.ha-services-ce** service name in the Service Name field where *nginx-rp* is the deployed service name and *ha-services-ce* is the namespace. Next, select the **Virtual Site** option in the Site or Virtual Site menu to choose **ves-io-shared/ves-io-all-res** site which includes all regional edge sites across F5 ADN. After that select **vK8s Networks on Site** which means that the origin server is on vK8s network on the site and, finally, click **Apply**. 
  
 .. figure:: assets/originserversetup.png 
  
-Click **Continue** to move on to apply the origin pool configuration. 
+Click **Add Origin Pool** to move on to apply the origin pool configuration. 
  
 .. figure:: assets/poolcontinue.png 
  
@@ -547,7 +550,7 @@ At this stage you should have successfully deployed a distributed app architectu
 •	A TCP load balancer that exposes and advertises this workload to other deployments within our topology; 
 •	An RE deployment that can run across many geographic regions, and contains an NGINX Reverse Proxy with a module that reads the data from our central database. 
 
-Such configuration could be used as a reference architecture for deploying a centralized database or backend service by way of Helm Charts running in Kubernetes, which can be connected to REs containing customer-facing apps & services closer to the users' region. These services can all be deployed and managed via F5 Distributed Cloud Console for faster time-to-value and more control. Of course, any of these services can also be secured with the F5 Web App and API Protection (WAAP) services as well, further improving the reliability and robustness of the resulting architecture.  
+Such configuration could be used as a reference architecture for deploying a centralized database or backend service by way of Helm Charts running in Kubernetes, which can be connected to REs containing customer-facing apps & services closer to the users' region. These services can all be deployed and managed via F5 Distributed Cloud Console for faster time-to-value and more control. Of course, any of these services can also be secured with Web Application and API Protection solutions as well, further improving the reliability and robustness of the resulting architecture.  
  
 We hope you now have a better understanding of F5 Distributed Cloud Services that provide virtual Kubernetes (vK8s) capabilities to simplify the deployment and management of distributed workloads across multiple clouds and regions and are now ready to implement them for your own organization. Should you have any issues or questions, please feel free to raise them via GitHub. Thank you! 
 
