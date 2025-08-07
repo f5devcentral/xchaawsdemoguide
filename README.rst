@@ -1,13 +1,19 @@
-==================================================
+===============================================================================
+F5 Enterprise Networking with High-Availability Config (in Amazon AWS)
+===============================================================================
 
-.. contents:: Table of Contents
+.. contents:: **Table of Contents**
 
 Objective
 #########
 
-Use this guide to explore how F5 Distributed Cloud Services enable **Hybrid Multicloud App Delivery** through virtual Kubernetes (vK8s) clusters, distributed edge sites, and seamless networking across clouds and regions. This guide focuses on deploying high-availability (HA) configurations by using Kubernetes Helm charts in a multi-node site, which can then be exposed to other services. This is a common use-case leveraging F5 Distributed Cloud Customer Edge (CE) for deploying a backend or a database, which can then be used in conjunction with Regional Edge (RE) deployments that consume and/or interact with the central CE location. 
+Use this guide to explore an AWS-specific example of High-Availability (HA) Application Delivery using F5 Distributed Cloud Services (XC). This guide walks through a sample configuration of **F5 Enterprise Networking** (F5 Distributed Cloud Network Connect) and **F5 Load Balancing** (F5 Distributed Cloud App Connect). Leveraging distributed architecutre such as this simplifies deployment and management of workloads across multiple clouds and regions.
 
-In this guide we will use an example of a PostgreSQL database deployment in a HA configuration on a CE and exposing it to a RE location(s) closer to end-users for lowered latency, improved performance, and data resiliency. 
+This guide will help you get familiar with the general pattern of deploying high-availability configurations by using Kubernetes Helm 
+charts in a multi-node site, which can then be exposed to other services. This is a common use-case leveraging F5 Distributed Cloud Customer Edge (CE) for deploying a 
+backend or a database, which can then be used in conjunction with Regional Edge (RE) deployments that consume and/or interact with the central CE location. 
+In this guide we will use an example of a PostgreSQL database deployment in a High-Availability (HA) configuration on a CE and exposing it to a RE location(s) closer 
+to end-users for lowered latency, improved performance, and data resiliency. 
 
 The guide includes the following key steps: 
 
@@ -482,8 +488,8 @@ Here we will drill into the cluster pods: their nodes, statuses, virtual sites t
   
 .. figure:: assets/nginxpods.png 
  
-Creating HTTP Load Balancer 
-***************************
+Creating HTTP Load Balancer (App Connect)
+******************************************
  
 To access our NGINX module that pulls the data from PostgreSQL we need an HTTP Load Balancer. This load balancer needs to be advertised on the internet so that it can be accessed from out of the vK8s cluster. Let's move on and create an HTTP Load Balancer. 
  
