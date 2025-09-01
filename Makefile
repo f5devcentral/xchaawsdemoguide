@@ -1,16 +1,7 @@
 .PHONY: default, secrets, docker-migrate, docker-nginx, docker, xc-deploy-bd, xc-deploy-nginx, deploy, delete
 
-DOCKER_SECRET		   ?= interestingstorage-secret
-DOCKER_REGISTRY 	   ?= interestingstorage
+DOCKER_REGISTRY 	   ?= ghcr.io/f5devcentral/xchaawsdemoguide/
 DOCKER_REPOSITORY_URI  ?= $(DOCKER_REGISTRY)/
-
-
-secrets:
-	KUBECONFIG=./ves_ha-services-ce_aws-ha-vk8s.yaml kubectl delete secret $(DOCKER_SECRET) --ignore-not-found
-	KUBECONFIG=./ves_ha-services-ce_aws-ha-vk8s.yaml kubectl create secret docker-registry $(DOCKER_SECRET) \
-		--docker-server=$(DOCKER_REGISTRY_SERVER) \
-		--docker-username=$(DOCKER_USER) \
-		--docker-password=$(DOCKER_PASS)
 
 
 docker-migrate:	
@@ -21,8 +12,8 @@ docker-migrate:
 		-t migrate \
 		-f ./docker/Dockerfile.migrate.nonroot \
 		.
-	docker tag migrate $(DOCKER_REPOSITORY_URI)migrate:latest
-	docker push $(DOCKER_REPOSITORY_URI)migrate:latest
+	docker tag migrate $(DOCKER_REPOSITORY_URI)migrate-nonroot:latest
+	docker push $(DOCKER_REPOSITORY_URI)migrate-nonroot:latest
 
 
 docker-nginx:	
@@ -40,10 +31,10 @@ docker-nginx:
 		-t openrestypg-nonroot \
 		-f ./docker/Dockerfile.openresty.nonroot \
 		.
-	docker tag openrestypg $(DOCKER_REPOSITORY_URI)openrestypg:latest
-	docker push $(DOCKER_REPOSITORY_URI)openrestypg:latest
-	docker tag openrestypg-nonroot $(DOCKER_REPOSITORY_URI)openrestypg-nonroot:latest
-	docker push $(DOCKER_REPOSITORY_URI)openrestypg-nonroot:latest
+	docker tag openrestypg $(DOCKER_REPOSITORY_URI)openresty-base:latest
+	docker push $(DOCKER_REPOSITORY_URI)openresty-base:latest
+	docker tag openrestypg-nonroot $(DOCKER_REPOSITORY_URI)openresty-nonroot:latest
+	docker push $(DOCKER_REPOSITORY_URI)openresty-nonroot:latest
 
 
 docker: docker-migrate, docker-nginx

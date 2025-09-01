@@ -4,15 +4,15 @@ terraform {
   required_providers {
     volterra = {
         source  = "volterraedge/volterra"
-        version = "=0.11.24"
+        version = "=0.11.44"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "=2.22.0"
+      version = "=2.38.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "=2.10.1"
+      version = "=3.0.2"
     }
   }
 }
@@ -27,7 +27,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     config_path = "${var.kubeconfig_path}"
   }
 }

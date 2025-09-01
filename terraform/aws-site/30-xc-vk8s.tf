@@ -6,13 +6,15 @@ resource "volterra_virtual_k8s" "hace" {
   name      = "${var.environment}-vk8s"
   namespace = volterra_namespace.hace.name
   vsite_refs {
-    name = volterra_virtual_site.hace.name
+    name      = volterra_virtual_site.hace.name
+    namespace = volterra_namespace.hace.name
+    tenant    = volterra_namespace.hace.tenant_name
   }  
 
   vsite_refs {
-    name      = "ves-io-all-res"
-    tenant    = "ves-io"
-    namespace = "shared"
+    name      = volterra_virtual_site.hace_vk8s.name
+    namespace = volterra_namespace.hace.name
+    tenant    = volterra_namespace.hace.tenant_name
   }
 
   depends_on = [
@@ -21,10 +23,17 @@ resource "volterra_virtual_k8s" "hace" {
 }
 
 resource "volterra_api_credential" "hace" {
+  created_at            = timestamp()
   name                  = "${var.environment}-kubeconfig"
   api_credential_type   = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.hace.name
   virtual_k8s_name      = volterra_virtual_k8s.hace.name
+
+  lifecycle {
+    ignore_changes = [ 
+      created_at 
+    ]
+  }
 }
 
 resource "volterra_virtual_site" "hace" {
@@ -36,6 +45,21 @@ resource "volterra_virtual_site" "hace" {
   }
 
   site_type = "CUSTOMER_EDGE"
+
+  depends_on = [ 
+    volterra_namespace.hace
+   ]
+}
+
+resource "volterra_virtual_site" "hace_vk8s" {
+  name      = "${var.environment}-vs-vk8s"
+  namespace = volterra_namespace.hace.name
+
+  site_selector {
+    expressions = ["ves.io/region in (ves-io-dallas, ves-io-seattle, ves-io-newyork)"]
+  }
+
+  site_type = "REGIONAL_EDGE"
 
   depends_on = [ 
     volterra_namespace.hace

@@ -4,15 +4,15 @@ terraform {
   required_providers {
     volterra = {
         source  = "volterraedge/volterra"
-        version = "=0.11.24"
+        version = "=0.11.44"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "=5.12.0"
+      version = "=6.11.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "=2.22.0"
+      version = "=2.38.0"
     }
   }
 }

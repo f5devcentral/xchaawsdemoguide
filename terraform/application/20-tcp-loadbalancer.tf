@@ -4,7 +4,9 @@ resource "volterra_tcp_loadbalancer" "hace" {
 
   origin_pools_weights {
     pool {
-      name = volterra_origin_pool.tcp_hace.name
+      name      = volterra_origin_pool.tcp_hace.name
+      namespace = data.volterra_namespace.hace.name
+      tenant    = data.volterra_namespace.hace.tenant_name
     }
   }
 
@@ -15,14 +17,15 @@ resource "volterra_tcp_loadbalancer" "hace" {
     advertise_where {
       vk8s_service {
         virtual_site {
-          name      = "ves-io-all-res"
-          tenant    = "ves-io"
-          namespace = "shared"
+          name      = var.virtual_site_name_vk8s
+          namespace = data.volterra_namespace.hace.name
+          tenant    = data.volterra_namespace.hace.tenant_name
         }
       }
       port = 5432
     }
   }
+
   retract_cluster                 = true
   hash_policy_choice_round_robin  = true
   tcp                             = true
@@ -39,7 +42,9 @@ resource "volterra_origin_pool" "tcp_hace" {
       service_name = "ha-postgres-postgresql-ha-pgpool.${var.environment}"
       site_locator {
         virtual_site {
-          name = "${var.virtual_site_name}"
+          name      = "${var.virtual_site_name}"
+          namespace = data.volterra_namespace.hace.name
+          tenant    = data.volterra_namespace.hace.tenant_name
         }
       }
       vk8s_networks = true

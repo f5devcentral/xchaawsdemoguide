@@ -54,7 +54,6 @@ resource "volterra_aws_vpc_site" "site" {
 
     az_nodes {
       aws_az_name  = "${var.aws_region}a"
-      disk_size    = 80
       local_subnet {
         existing_subnet_id = element(aws_subnet.subnet_a.*.id, 0)
       }
@@ -62,7 +61,6 @@ resource "volterra_aws_vpc_site" "site" {
 
     az_nodes {
       aws_az_name  = "${var.aws_region}b"
-      disk_size    = 80
       local_subnet {
         existing_subnet_id = element(aws_subnet.subnet_b.*.id, 0)
       }
@@ -70,7 +68,6 @@ resource "volterra_aws_vpc_site" "site" {
 
     az_nodes {
       aws_az_name  = "${var.aws_region}c"
-      disk_size    = 80
       local_subnet {
         existing_subnet_id = element(aws_subnet.subnet_c.*.id, 0)
       }
@@ -82,6 +79,12 @@ resource "volterra_aws_vpc_site" "site" {
   }
 
   no_worker_nodes = true
+
+  lifecycle {
+    ignore_changes = [
+      labels
+    ]
+  }
 
   depends_on = [
     volterra_cloud_credentials.aws_cred,

@@ -20,16 +20,12 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
 
     spec:
-      {{- with .Values.imagePullSecret }}
-      imagePullSecrets:
-        - name: {{ .name }}
-      {{- end }}
       serviceAccountName: {{ .Values.nginx.name }}
       securityContext:
         {{- toYaml .Values.nginx.podSecurityContext | nindent 8 }}    
       initContainers:
         - name: initdb
-          image: interestingstorage/migrate:latest
+          image: ghcr.io/f5devcentral/xchaawsdemoguide/migrate-nonroot:latest
           imagePullPolicy: {{ .Values.pullPolicy }}          
           resources:
             {{- toYaml .Values.migration.resources | nindent 12 }}
@@ -45,7 +41,7 @@ spec:
               mountPath: "{{ .Values.migration.migration_path }}"
       containers:
       - name: nginx-rp        
-        image: interestingstorage/openrestypg-nonroot:latest
+        image: ghcr.io/f5devcentral/xchaawsdemoguide/openresty-nonroot:latest
         ports:
         - name: http
           containerPort: 8080
