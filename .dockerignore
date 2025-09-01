@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+README.rst
+*.md
+*.rst
+
+# Terraform
+terraform/
+
+# Build artifacts
+.DS_Store
+*.log
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+
+# Assets (images not needed for Docker builds)
+assets/
+
+# Helm charts (unless specifically needed)
+helm/
+
+# Other configs not needed in container
+Makefile
+LICENSE
+ves_ha-services-ce_aws-ha-vk8s.yaml

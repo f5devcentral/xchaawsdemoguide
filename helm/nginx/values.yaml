@@ -3,9 +3,6 @@ pullPolicy: Always
 securityContext: 
   runAsNonRoot: true
 
-imagePullSecret:
-  name: interestingstorage-secret
-
 nginx:
   name: "nginx-rp"
   podSecurityContext: 
