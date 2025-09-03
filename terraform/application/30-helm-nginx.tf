@@ -14,4 +14,8 @@ resource "helm_release" "nginx" {
       value = "${data.volterra_namespace.hace.name}/${var.virtual_site_name_vk8s}"
     }
   ]
+
+  depends_on = [ 
+    helm_release.postgres
+  ]
 }

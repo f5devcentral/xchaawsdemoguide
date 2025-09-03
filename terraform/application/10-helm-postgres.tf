@@ -12,6 +12,10 @@ resource "helm_release" "postgres" {
 
   set =[
     {
+      name  = "global.security.allowInsecureImages"
+      value = "true"
+    },
+    {
       name  = "postgresql-ha.commonAnnotations.ves\\.io\\/virtual-sites"
       value = "${data.volterra_namespace.hace.name}/${var.virtual_site_name}"
     },

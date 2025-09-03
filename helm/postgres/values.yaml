@@ -3,17 +3,29 @@ postgresql-ha:
     ves.io/virtual-sites: "ha-services-ce/aws-ha-vs"
 
   clusterDomain: aws-ha.tme-lab-works-oeaclgke.tenant.local  
-  kubeVersion: "v1.25.2"
 
   persistence:
     enabled: true
-    size: 30Gi
+    size: 1Gi
 
-  postgresql:        
+  witness:
+    create: false
+    pdb:
+      create: false
+
+  postgresql:
+    image:
+      registry: ghcr.io
+      repository: f5devcentral/xchaawsdemoguide/postgresql-repmgr
+      tag: 17.6.0-debian-12-r2
+    networkPolicy:
+      enabled: false
+    pdb:
+      create: false
     resources:
       requests:
         memory: 256Mi
-        cpu: 500m
+        cpu: 5m
       limits:
         memory: 512Mi
         cpu: 1500m
@@ -21,27 +33,26 @@ postgresql-ha:
     containerSecurityContext:
       runAsNonRoot: true
 
-    replicaCount: 2
+    replicaCount: 3
     username: haservices
-    password: haservicespass    
+    password: haservicespass
     database: haservicesdb
     repmgrUsername: haservices
-    repmgrPassword: haservicespass    
+    repmgrPassword: haservicespass
     repmgrDatabase: repmgrhaservicesdb
 
   pgpool:
-    replicaCount: 1
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 500m
-      limits:
-        memory: 512Mi
-        cpu: 1500m
-        
-    childLifeTime: 3600
-    containerSecurityContext:
-      runAsNonRoot: true
+    networkPolicy:
+      enabled: false
+    pdb:
+      create: false
+    image:
+      registry: ghcr.io
+      repository: f5devcentral/xchaawsdemoguide/pgpool
+      tag: 4.6.3-debian-12-r0
     
     adminUsername: haservices
     adminPassword: haservicespass
+
+
+
