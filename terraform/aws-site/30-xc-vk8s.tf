@@ -56,7 +56,7 @@ resource "volterra_virtual_site" "hace_vk8s" {
   namespace = volterra_namespace.hace.name
 
   site_selector {
-    expressions = ["ves.io/region in (ves-io-dallas, ves-io-seattle, ves-io-newyork)"]
+    expressions = ["ves.io/region in (ves-io-dallas, ves-io-frankfurt, ves-io-newyork)"]
   }
 
   site_type = "REGIONAL_EDGE"
