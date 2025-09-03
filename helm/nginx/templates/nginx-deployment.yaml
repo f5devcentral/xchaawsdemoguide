@@ -1,8 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.nginx.name }}  
-
+  name: {{ .Values.nginx.name }}
+  {{- with .Values.nginx.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -20,13 +23,17 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
 
     spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret.name }}
+      {{- end }}
       serviceAccountName: {{ .Values.nginx.name }}
       securityContext:
         {{- toYaml .Values.nginx.podSecurityContext | nindent 8 }}    
       initContainers:
         - name: initdb
-          image: ghcr.io/f5devcentral/xchaawsdemoguide/migrate-nonroot:latest
-          imagePullPolicy: {{ .Values.pullPolicy }}          
+          image: "{{ .Values.migration.image.repository }}:{{ .Values.migration.image.tag }}"
+          imagePullPolicy: {{ .Values.pullPolicy }}
           resources:
             {{- toYaml .Values.migration.resources | nindent 12 }}
           args: 
@@ -41,7 +48,7 @@ spec:
               mountPath: "{{ .Values.migration.migration_path }}"
       containers:
       - name: nginx-rp        
-        image: ghcr.io/f5devcentral/xchaawsdemoguide/openresty-nonroot:latest
+        image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
         ports:
         - name: http
           containerPort: 8080

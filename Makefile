@@ -1,7 +1,15 @@
 .PHONY: default, secrets, docker-migrate, docker-nginx, docker, xc-deploy-bd, xc-deploy-nginx, deploy, delete
 
-DOCKER_REGISTRY 	   ?= ghcr.io/f5devcentral/xchaawsdemoguide/
-DOCKER_REPOSITORY_URI  ?= $(DOCKER_REGISTRY)/
+DOCKER_SECRET ?= registry-secret
+DOCKER_REGISTRY ?= ghcr.io/f5devcentral/xchaawsdemoguide
+DOCKER_REPOSITORY_URI ?= $(DOCKER_REGISTRY)/
+
+secrets:
+	KUBECONFIG=./ves_ha-services-aws-ha-vk8s.yaml kubectl delete secret $(DOCKER_SECRET) --ignore-not-found
+	KUBECONFIG=./ves_ha-services-aws-ha-vk8s.yaml kubectl create secret docker-registry $(DOCKER_SECRET) \
+		--docker-server=$(DOCKER_REGISTRY_SERVER) \
+		--docker-username=$(DOCKER_USER) \
+		--docker-password=$(DOCKER_PASS)
 
 
 docker-migrate:	

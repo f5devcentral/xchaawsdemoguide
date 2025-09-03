@@ -3,8 +3,14 @@ pullPolicy: Always
 securityContext: 
   runAsNonRoot: true
 
+# imagePullSecret:
+#   name: "registry-secret"
+
 nginx:
   name: "nginx-rp"
+  image:
+    repository: ghcr.io/f5devcentral/xchaawsdemoguide/openresty-nonroot
+    tag: latest
   podSecurityContext: 
     runAsNonRoot: true    
 
@@ -13,21 +19,24 @@ nginx:
   service:
     type: ClusterIP
     port: 9080
-  serviceAccount:  
+  serviceAccount:
     create: true
   resources:
       requests:
         memory: 256Mi
-        cpu: 500m
+        cpu: 5m
 
 migration:
   username: haservices
-  password: haservicespass    
+  password: haservicespass
   host: re2ce.internal
   port: "5432"
   name: haservicesdb
   migration_path: "/migrations"
+  image:
+    repository: ghcr.io/f5devcentral/xchaawsdemoguide/migrate-nonroot
+    tag: latest
   resources:
       requests:
         memory: 256Mi
-        cpu: 500m
+        cpu: 5m

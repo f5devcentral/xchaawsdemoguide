@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.nginx.name }}
+  {{- with .Values.nginx.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
 spec:
   type: {{ .Values.nginx.service.type }}
   ports:

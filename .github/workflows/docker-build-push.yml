@@ -36,17 +36,6 @@ jobs:
             context: .
 
     steps:
-    - name: Maximize build space
-      uses: easimon/maximize-build-space@master
-      with:
-        root-reserve-mb: 1024
-        swap-size-mb: 2048
-        remove-dotnet: 'true'
-        remove-android: 'true'
-        remove-haskell: 'true'
-        remove-codeql: 'true'
-        remove-docker-images: 'true'
-
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -89,9 +78,46 @@ jobs:
           BUILDKIT_INLINE_CACHE=1
         builder: ${{ steps.buildx.outputs.name }}
         shm-size: 2g
+        provenance: false
+        sbom: false
+
+  copy-bitnami-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      matrix:
+        include:
+          - source-image: bitnamilegacy/postgresql-repmgr:17.6.0-debian-12-r2
+            target-name: postgresql-repmgr
+            target-tag: 17.6.0-debian-12-r2
+          - source-image: bitnamilegacy/pgpool:4.6.3-debian-12-r0
+            target-name: pgpool
+            target-tag: 4.6.3-debian-12-r0
+
+    steps:
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Copy and push Bitnami image
+      run: |
+        # Pull the source image
+        docker pull ${{ matrix.source-image }}
+        
+        # Tag it for our registry with specific version
+        docker tag ${{ matrix.source-image }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.target-name }}:${{ matrix.target-tag }}
+        
+        # Push to our registry
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.target-name }}:${{ matrix.target-tag }}
 
   build-summary:
-    needs: build-and-push
+    needs: [build-and-push, copy-bitnami-images]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -102,5 +128,60 @@ jobs:
         echo "- migrate-nonroot" >> $GITHUB_STEP_SUMMARY
         echo "- openresty-base" >> $GITHUB_STEP_SUMMARY
         echo "- openresty-nonroot" >> $GITHUB_STEP_SUMMARY
+        echo "- postgresql-repmgr" >> $GITHUB_STEP_SUMMARY
+        echo "- pgpool" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "Images are available at: ghcr.io/${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+
+  cleanup-untagged:
+    needs: [build-and-push, copy-bitnami-images]
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Delete untagged container images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: '${{ github.event.repository.name }}/migrate-nonroot'
+        package-type: 'container'
+        min-versions-to-keep: 1
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Delete untagged openresty-base images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: '${{ github.event.repository.name }}/openresty-base'
+        package-type: 'container'
+        min-versions-to-keep: 1
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Delete untagged openresty-nonroot images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: '${{ github.event.repository.name }}/openresty-nonroot'
+        package-type: 'container'
+        min-versions-to-keep: 1
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Delete untagged postgresql-repmgr images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: '${{ github.event.repository.name }}/postgresql-repmgr'
+        package-type: 'container'
+        min-versions-to-keep: 1
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Delete untagged pgpool images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: '${{ github.event.repository.name }}/pgpool'
+        package-type: 'container'
+        min-versions-to-keep: 1
+        delete-only-untagged-versions: true
+        token: ${{ secrets.GITHUB_TOKEN }}
