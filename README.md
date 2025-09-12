@@ -262,16 +262,13 @@ Before we proceed to the next step, we need to update the credentials in the Mak
 4. Indicate your `docker-username`.
 5. Indicate your `docker-password` (which can be a password or access token).
 
-![Make secret](assets/makesecret.png)
-
 ### Making Secrets
- 
-vK8s needs to download Docker images from a registry. This might be *docker.io* or any other Docker registry your company uses. The Docker secrets need to be created from the command line using the *kubectl create secret* command. Use the name of the *kubeconfig* file that you downloaded in the previous step. 
- 
-NOTE: The created secret will not be visible from the Registries UI, as this section is used to create Deployments from the UI. The Helm script will be used in this demo. 
+
+vK8s needs to download Docker images from a registry. This might be _docker.io_ or any other Docker registry your company uses. The Docker secrets need to be created from the command line using the _kubectl create secret_ command. Use the name of the _kubeconfig_ file that you downloaded in the previous step.
+
+NOTE: The created secret will not be visible from the Registries UI, as this section is used to create Deployments from the UI. The Helm script will be used in this demo.
 
 ![Make Secret](assets/makesecret.png)
-
 
 ### Updating DB Deployment Chart Values
 
