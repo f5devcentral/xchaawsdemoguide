@@ -24,7 +24,7 @@ nginx:
   resources:
       requests:
         memory: 256Mi
-        cpu: 5m
+        cpu: 50m
 
 migration:
   username: haservices
@@ -39,4 +39,4 @@ migration:
   resources:
       requests:
         memory: 256Mi
-        cpu: 5m
+        cpu: 50m
