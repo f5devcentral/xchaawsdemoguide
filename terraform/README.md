@@ -1,4 +1,4 @@
-#   Deployment instructions
+# Deployment instructions
 
 ## Deploy infrastructure
 
@@ -18,8 +18,8 @@ Upload cloudformation template located in the **./cloudformation/aws-service-acc
 
 Fill required parameters and click Next.
 
-* **Stack name** - The name associated with the AWS Cloud Formation stack. For example: xc-cloud-access
-* **Policy Name** - The name of the Service Account Policy. For example: F5XCServiceAccountPolicyForAWSSite
+- **Stack name** - The name associated with the AWS Cloud Formation stack. For example: xc-cloud-access
+- **Policy Name** - The name of the Service Account Policy. For example: F5XCServiceAccountPolicyForAWSSite
 
 ![](../assets/aws/aws_stack_details.png)
 
@@ -49,7 +49,7 @@ Open **./aws-site/var.tf** and fill variables with your Access Key and Access Se
         default = "your_aws_access_secret"
     }
 
-Find **xc_api_url** variable and fill it with your F5 xC tenant name.
+Find **xc_api_url** variable and fill it with your F5 Distributed Cloud tenant name.
 
     variable "xc_api_url" {
         type = string
@@ -109,14 +109,13 @@ Save the terraform output
     kubecofnig_path = "../kubeconfig.conf"
     tenant_name = "your_tenant"
 
-Open F5 Distributed Cloud Console and navigate to the Multi-Cloud Network Connect tab.
+Open Distributed Cloud Console and navigate to the Multi-Cloud Network Connect tab.
 
 ![](../assets/aws/aws_site.png)
 
-Open **Site List** and check the **Health Score**. It may take some time to provision the node.
+Open **Infrastructure** => **Sites** and check the **Health Score**. It may take some time to provision the node.
 
 ![](../assets/aws/aws_site_health.png)
-
 
 ## Deploy application
 
@@ -128,14 +127,14 @@ Update the **xc_api_p12_file** environment variable with the path for the .p12 c
         default = "./path-to-api-cert.p12"
     }
 
-Find the **xc_api_url** variable and fill it with your F5 xC tenant name.
+Find the **xc_api_url** variable and fill it with your Distributed Cloud Services tenant name.
 
     variable "xc_api_url" {
         type = string
         default = "https://your_tenant.console.ves.volterra.io/api"
     }
 
-Find the **cluster_domain** variable in the terraform output from the previous step and update the value in the **var.tf** file. You can also find how to generate it [manually in the guide](https://github.com/f5devcentral/xchacedemoguide#updating-db-deployment-chart-values)
+Find the **cluster_domain** variable in the terraform output from the previous step and update the value in the **var.tf** file. You can also find how to generate it [manually in the guide](https://github.com/f5devcentral/xchaawsdemoguide/tree/main?tab=readme-ov-file#updating-db-deployment-chart-values)
 
     variable "cluster_domain" {
       type    = string
@@ -167,33 +166,32 @@ Run **apply** command to deploy the app
 
     terraform apply
 
-
 ## AWS-Site Variables description
 
-Variable Name       | Description                                                     | Default Value          
---------------------|-----------------------------------------------------------------|------------------------
-environment         | Environment name. Usually match with XC namespace name.         | "ha-services-ce"                   
-xc_api_p12_file     | API credential p12 file path.                                   | "../api-creds.p12"                  
-xc_api_url          | Tenant API url file path.                                       | "https://**your_tenant_name**.console.ves.volterra.io/api"                   
-kubeconfig_path     | Generated vk8s kubeconfig file path.                            | "../kubeconfig.conf"                   
-aws_region          | AWS Region name                                                 | "us-east-2"
-aws_access_key      | AWS Access Key                                                  | ""
-aws_secret_key      | AWS Secret Key                                                  | ""
+| Variable Name   | Description                                             | Default Value                                              |
+| --------------- | ------------------------------------------------------- | ---------------------------------------------------------- |
+| environment     | Environment name. Usually match with XC namespace name. | "ha-services-ce"                                           |
+| xc_api_p12_file | API credential p12 file path.                           | "../api-creds.p12"                                         |
+| xc_api_url      | Tenant API url file path.                               | "https://**your_tenant_name**.console.ves.volterra.io/api" |
+| kubeconfig_path | Generated vk8s kubeconfig file path.                    | "../kubeconfig.conf"                                       |
+| aws_region      | AWS Region name                                         | "us-east-2"                                                |
+| aws_access_key  | AWS Access Key                                          | ""                                                         |
+| aws_secret_key  | AWS Secret Key                                          | ""                                                         |
 
 ## Application Variables description
 
-Variable Name       | Description                                                     | Default Value          
---------------------|-----------------------------------------------------------------|------------------------
-environment         | Environment name. Usually match with XC namespace name.         | "ha-services-ce"                   
-xc_api_p12_file     | API credential p12 file path.                                   | "../api-creds.p12"                  
-xc_api_url          | Tenant API url file path.                                       | "https://**your_tenant_name**.console.ves.volterra.io/api"                   
-kubeconfig_path     | vk8s kubeconfig file path.                                      | "../kubeconfig.conf"                   
-helm_path           | Helm charts path.                                               | "../../helm"
-cluster_domain      | Cluster domain in format **{site_name}.{tenant_id}**.tenant.local. Where **site_name** is the Edge site name. Can be generated from [the guide](https://github.com/f5devcentral/xchacedemoguide#step-2-deploy-ha-postgresql-to-ce) or taken from the terraform's output of the previous step.   |  **your_site_name.your_tenant_full_name**.tenant.local
-registry_username   | Docker Registry Username                                        | ""
-registry_password   | Docker Registry Password                                        | ""
-registry_email      | Docker Registry Email                                           | ""
-virtual_site_name   | Virtual Site Name                                               | "ha-services-ce-vs"
+| Variable Name     | Description                                                                                                                                                                                                                                                                                   | Default Value                                              |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| environment       | Environment name. Usually match with XC namespace name.                                                                                                                                                                                                                                       | "ha-services-ce"                                           |
+| xc_api_p12_file   | API credential p12 file path.                                                                                                                                                                                                                                                                 | "../api-creds.p12"                                         |
+| xc_api_url        | Tenant API url file path.                                                                                                                                                                                                                                                                     | "https://**your_tenant_name**.console.ves.volterra.io/api" |
+| kubeconfig_path   | vk8s kubeconfig file path.                                                                                                                                                                                                                                                                    | "../kubeconfig.conf"                                       |
+| helm_path         | Helm charts path.                                                                                                                                                                                                                                                                             | "../../helm"                                               |
+| cluster_domain    | Cluster domain in format **{site_name}.{tenant_id}**.tenant.local. Where **site_name** is the Edge site name. Can be generated from [the guide](https://github.com/f5devcentral/xchacedemoguide#step-2-deploy-ha-postgresql-to-ce) or taken from the terraform's output of the previous step. | **your_site_name.your_tenant_full_name**.tenant.local      |
+| registry_username | Docker Registry Username                                                                                                                                                                                                                                                                      | ""                                                         |
+| registry_password | Docker Registry Password                                                                                                                                                                                                                                                                      | ""                                                         |
+| registry_email    | Docker Registry Email                                                                                                                                                                                                                                                                         | ""                                                         |
+| virtual_site_name | Virtual Site Name                                                                                                                                                                                                                                                                             | "ha-services-ce-vs"                                        |
 
 ## Delete environment
 
